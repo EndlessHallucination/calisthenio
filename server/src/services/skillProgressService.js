@@ -71,7 +71,18 @@ const getCurrentMilestone = async (skillId) => {
   return milestoneResult.rows[0] || null;
 };
 
+const getNextMilestone = async (skillId, currentSequence) => {
+  const result = await db.query(
+    `SELECT * FROM milestones 
+     WHERE skill_id = $1 
+     AND sequence = $2`,
+    [skillId, currentSequence + 1],
+  );
+  return result.rows[0] || null;
+};
+
 module.exports = {
   startSkill,
   getCurrentMilestone,
+  getNextMilestone,
 };
