@@ -53,6 +53,63 @@ async function seed() {
       [skillMap["Front Lever"], skillMap["Handstand"]],
     );
 
+    await client.query(`
+INSERT INTO exercises
+(name, category, equipment, difficulty)
+VALUES
+('Scap Pull-ups', 'pulling', 'bar', 'beginner'),
+('Tuck Front Lever Hold', 'pulling', 'bar', 'beginner'),
+('Advanced Tuck Front Lever Hold', 'pulling', 'bar', 'intermediate'),
+('One Leg Front Lever Hold', 'pulling', 'bar', 'intermediate'),
+('Straddle Front Lever Hold', 'pulling', 'bar', 'advanced'),
+('Front Lever Raises', 'pulling', 'bar', 'advanced'),
+('Ice Cream Makers', 'pulling', 'bar', 'intermediate'),
+('Hanging Knee Raises', 'pulling', 'bar', 'beginner'),
+('Hollow Body Hold', 'core', 'bodyweight', 'beginner'),
+('Dragon Flag Negatives', 'core', 'bar', 'intermediate')
+ON CONFLICT (name) DO NOTHING
+`);
+
+    const exercisesResult = await client.query(
+      "SELECT id, name FROM exercises",
+    );
+
+    const exerciseMap = {};
+
+    for (const exercise of exercisesResult.rows) {
+      exerciseMap[exercise.name] = exercise.id;
+    }
+    await client.query(
+      `
+INSERT INTO skill_exercises
+(skill_id, exercise_id, purpose)
+VALUES
+($1, $2, 'warmup'),
+($1, $3, 'progression'),
+($1, $4, 'progression'),
+($1, $5, 'progression'),
+($1, $6, 'progression'),
+($1, $7, 'strength'),
+($1, $8, 'strength'),
+($1, $9, 'warmup'),
+($1, $10, 'accessory'),
+($1, $11, 'accessory')
+ON CONFLICT (skill_id, exercise_id, purpose) DO NOTHING
+`,
+      [
+        skillMap["Front Lever"],
+        exerciseMap["Scap Pull-ups"],
+        exerciseMap["Tuck Front Lever Hold"],
+        exerciseMap["Advanced Tuck Front Lever Hold"],
+        exerciseMap["One Leg Front Lever Hold"],
+        exerciseMap["Straddle Front Lever Hold"],
+        exerciseMap["Front Lever Raises"],
+        exerciseMap["Ice Cream Makers"],
+        exerciseMap["Hanging Knee Raises"],
+        exerciseMap["Hollow Body Hold"],
+        exerciseMap["Dragon Flag Negatives"],
+      ],
+    );
     await client.query("COMMIT");
     console.log("Skills seeded successfully.");
   } catch (err) {
