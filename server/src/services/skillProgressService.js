@@ -81,8 +81,64 @@ const getNextMilestone = async (skillId, currentSequence) => {
   return result.rows[0] || null;
 };
 
+const completeMilestone = async (skillProgressId, milestoneId) => {
+  const existing = await db.query(
+    `SELECT * FROM user_milestones WHERE skill_progress_id = $1 AND milestone_id = $2`,
+    [skillProgressId, milestoneId],
+  );
+
+  if (existing.rows.length > 0) {
+    throw new Error("Milestone already completed");
+  }
+
+  await db.query(
+    `INSERT INTO user_milestones (skill_progress_id, milestone_id) VALUES ($1, $2)`,
+    [skillProgressId, milestoneId],
+  );
+
+  const completedResult = await db.query(
+    `SELECT COUNT(*) AS completed FROM user_milestones WHERE skill_progress_id = $1`,
+    [skillProgressId],
+  );
+
+  const completed = Number(completedResult.rows[0].completed);
+
+  const totalResult = await db.query(
+    `SELECT COUNT(*) AS total
+       FROM milestones
+       WHERE skill_id = (
+       SELECT skill_id
+       FROM skill_progress
+       WHERE id = $1
+     )`,
+    [skillProgressId],
+  );
+
+  const total = Number(totalResult.rows[0].total);
+
+  if (completed === total) {
+    await db.query(
+      `UPDATE skill_progress
+       SET status = 'completed',
+           updated_at = NOW()
+       WHERE id = $1`,
+      [skillProgressId],
+    );
+
+    return {
+      completed: true,
+      message: "Skill completed!",
+    };
+  }
+  return {
+    completed: false,
+    message: "Milestone completed. Generate next routine.",
+  };
+};
+
 module.exports = {
   startSkill,
   getCurrentMilestone,
   getNextMilestone,
+  completeMilestone,
 };

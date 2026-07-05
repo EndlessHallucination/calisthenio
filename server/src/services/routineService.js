@@ -143,4 +143,42 @@ const generateAndStoreRoutine = async (skillId) => {
   }
 };
 
-module.exports = { generateAndStoreRoutine };
+const getActiveRoutine = async (skillId) => {
+  const result = await db.query(
+    `
+    SELECT 
+      r.*,
+      json_agg(
+        json_build_object(
+          'id', re.id,
+          'exercise_id', re.exercise_id,
+          'order_index', re.order_index,
+          'sets', re.sets,
+          'reps', re.reps,
+          'hold_time_seconds', re.hold_time_seconds,
+          'rest_seconds', re.rest_seconds,
+          'notes', re.notes,
+          'exercise_name', e.name,
+          'category', e.category
+        )
+        ORDER BY re.order_index
+      ) AS exercises
+    FROM skill_progress sp
+    JOIN routines r ON r.skill_progress_id = sp.id
+    LEFT JOIN routine_exercises re ON re.routine_id = r.id
+    LEFT JOIN exercises e ON e.id = re.exercise_id
+    WHERE sp.skill_id = $1
+      AND r.is_active = true
+    GROUP BY r.id
+    LIMIT 1;
+    `,
+    [skillId],
+  );
+
+  return result.rows[0] || null;
+};
+
+module.exports = {
+  generateAndStoreRoutine,
+  getActiveRoutine,
+};

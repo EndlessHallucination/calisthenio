@@ -1,9 +1,15 @@
 const express = require("express");
 
 const router = express.Router();
+const db = require("../config/db");
 
+const { generateAndStoreRoutine } = require("../services/routineService");
 const { getAllSkills, getSkillById } = require("../services/skillService");
-const { startSkill, getCurrentMilestone } = require("../services/skillProgressService");
+const {
+  startSkill,
+  getCurrentMilestone,
+  completeMilestone,
+} = require("../services/skillProgressService");
 
 router.get("/", async (req, res) => {
   try {
@@ -50,4 +56,36 @@ router.get("/:id/current-milestone", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.post("/:id/milestones/:milestoneId/complete", async (req, res) => {
+  try {
+    const skillId = req.params.id;
+    const milestoneId = req.params.milestoneId;
+
+    const progressResult = await db.query(
+      `SELECT * FROM skill_progress WHERE skill_id = $1`,
+      [skillId],
+    );
+
+    if (!progressResult.rows[0]) {
+      return res.status(404).json({ error: "Skill not started" });
+    }
+
+    const skillProgressId = progressResult.rows[0].id;
+    const result = await completeMilestone(skillProgressId, milestoneId);
+
+    if (!result.completed) {
+      const routine = await generateAndStoreRoutine(skillId);
+      return res.json({ ...result, routine });
+    }
+
+    res.json(result);
+  } catch (error) {
+    if (error.message === "Milestone already completed") {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
