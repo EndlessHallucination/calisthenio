@@ -4,7 +4,11 @@ const router = express.Router();
 const db = require("../config/db");
 
 const { generateAndStoreRoutine } = require("../services/routineService");
-const { getAllSkills, getSkillById } = require("../services/skillService");
+const {
+  getAllSkills,
+  getSkillById,
+  getActiveSkills,
+} = require("../services/skillService");
 const {
   startSkill,
   getCurrentMilestone,
@@ -14,6 +18,14 @@ const {
 router.get("/", async (req, res) => {
   try {
     const result = await getAllSkills();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.get("/active", async (req, res) => {
+  try {
+    const result = await getActiveSkills();
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });

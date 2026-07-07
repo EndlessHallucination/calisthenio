@@ -19,3 +19,13 @@ export const getCurrentMilestone = async (id) => {
   const { data } = await client.get(`/skills/${id}/current-milestone`);
   return data;
 };
+
+export const getActiveSkills = async () => {
+  try {
+    const { data } = await client.get("/skills/active");
+    return data;
+  } catch (error) {
+    if (error.response?.status === 404) return null;
+    throw error;
+  }
+};

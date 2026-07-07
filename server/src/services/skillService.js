@@ -19,4 +19,14 @@ const getSkillById = async (id) => {
   };
 };
 
-module.exports = { getAllSkills, getSkillById };
+const getActiveSkills = async () => {
+  const result = await db.query(
+    `SELECT s.*, sp.id as skill_progress_id, sp.status, sp.started_at
+     FROM skills s
+     JOIN skill_progress sp ON sp.skill_id = s.id
+     WHERE sp.status = 'active'`,
+  );
+  return result.rows;
+};
+
+module.exports = { getAllSkills, getSkillById, getActiveSkills };

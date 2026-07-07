@@ -9,6 +9,7 @@ export const getProfile = async () => {
     throw error;
   }
 };
+
 export const createProfile = async (profileData) => {
   const { data } = await client.post("/profile", profileData);
   return data;
