@@ -5,18 +5,25 @@ export const getSkills = async () => {
   return data;
 };
 
-export const getSkill = async (id) => {
-  const { data } = await client.get(`/skills/${id}`);
+export const getSkill = async (skillId) => {
+  const { data } = await client.get(`/skills/${skillId}`);
   return data;
 };
 
-export const startSkill = async (id) => {
-  const { data } = await client.post(`/skills/${id}/start`);
+export const startSkill = async (skillId) => {
+  const { data } = await client.post(`/skills/${skillId}/start`);
   return data;
 };
 
-export const getCurrentMilestone = async (id) => {
-  const { data } = await client.get(`/skills/${id}/current-milestone`);
+export const getCurrentMilestone = async (skillId) => {
+  const { data } = await client.get(`/skills/${skillId}/current-milestone`);
+  return data;
+};
+
+export const completeMilestone = async (skillId, milestoneId) => {
+  const { data } = await client.post(
+    `/skills/${skillId}/milestones/${milestoneId}/complete`,
+  );
   return data;
 };
 

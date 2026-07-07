@@ -1,8 +1,8 @@
 import client from "./client";
 
-export const getActiveRoutine = async (id) => {
+export const getActiveRoutine = async (skillId) => {
   try {
-    const { data } = await client.get(`/routines/active?skill_id=${id}`); // ← correct
+    const { data } = await client.get(`/routines/active?skill_id=${skillId}`); // ← correct
     return data;
   } catch (error) {
     if (error.response?.status === 404) return null;

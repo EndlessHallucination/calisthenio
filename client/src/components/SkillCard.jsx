@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCurrentMilestone } from "../api/skills"
+import { getCurrentMilestone, completeMilestone } from "../api/skills"
 import { getActiveRoutine, generateRoutine } from "../api/routines";
 
 const SkillCard = ({ skill }) => {
@@ -15,17 +15,35 @@ const SkillCard = ({ skill }) => {
         queryFn: () => getActiveRoutine(skill.id)
     })
 
-    const { mutate: generate, isPending } = useMutation({
+    const { mutate: generate, isPending: isGenerating } = useMutation({
         mutationFn: () => generateRoutine(skill.id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['routine', skill.id] })
         }
     })
 
+    const { mutate: complete, isPending: isCompleting } = useMutation({
+        mutationFn: () => completeMilestone(skill.id, milestone.id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['milestone', skill.id] }),
+                queryClient.invalidateQueries({ queryKey: ['routine', skill.id] })
+        }
+    })
+
     return (
         <div>
             <h1>{skill.name}</h1>
-            {milestone && <h2>Current milestone: {milestone.name}</h2>}
+            {milestone &&
+                <div>
+                    <h2>Current milestone: {milestone.name}</h2>
+                    <button
+                        onClick={() => complete()}
+                        disabled={isCompleting}
+                    >
+                        {isCompleting ? 'Completing...' : 'Complete Milestone'}
+                    </button>
+                </div>
+            }
             {routine
                 ? routine.exercises.map(ex => (
                     <div key={ex.id}>
@@ -34,8 +52,8 @@ const SkillCard = ({ skill }) => {
                     </div>
                 ))
                 :
-                <button onClick={() => generate()} disabled={isPending}>
-                    {isPending ? 'Generating...' : 'Generate Routine'}
+                <button onClick={() => generate()} disabled={isGenerating}>
+                    {isGenerating ? 'Generating...' : 'Generate Routine'}
                 </button>
             }
         </div>
