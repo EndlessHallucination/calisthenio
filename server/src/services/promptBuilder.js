@@ -5,6 +5,7 @@ function buildRoutinePrompt({
   nextMilestone,
   completedMilestones,
   availableExercises,
+  recentWorkouts,
 }) {
   const completed =
     completedMilestones.length > 0
@@ -22,6 +23,28 @@ function buildRoutinePrompt({
         `- ${e.name} (${e.category}${e.equipment ? `, ${e.equipment}` : ""})`,
     )
     .join("\n");
+
+  const recent =
+    recentWorkouts.length > 0
+      ? recentWorkouts
+          .map((workout) => {
+            const date = new Date(workout.workout_date).toLocaleDateString();
+
+            const performed = workout.exercises
+              .map((exercise) => {
+                const performance =
+                  exercise.hold_seconds != null
+                    ? `${exercise.sets} sets, ${exercise.hold_seconds} seconds`
+                    : `${exercise.sets} sets, ${exercise.reps} reps`;
+
+                return `${exercise.name} — ${performance}`;
+              })
+              .join(". ");
+
+            return `- ${date}: ${performed}.`;
+          })
+          .join("\n")
+      : "- No previous workouts.";
 
   return `
 You are an elite calisthenics coach specializing in bodyweight strength, skill progression, and injury prevention.
@@ -76,6 +99,20 @@ COMPLETED MILESTONES
 ${completed}
 
 =========================
+RECENT WORKOUTS
+=========================
+
+Last 3 workouts:
+
+${recent}
+
+Use these workouts to:
+• Avoid repeating the exact same session.
+• Apply progressive overload where appropriate.
+• Continue progressing from the previous sessions.
+• Balance intensity and recovery.
+
+=========================
 AVAILABLE EXERCISES
 =========================
 
@@ -97,6 +134,8 @@ Create a routine that:
 • Includes enough volume for progress without excessive fatigue.
 • Uses progressive overload principles.
 • Builds strength specific to ${skill.name}.
+• Takes previous workouts into account.
+• Avoids repeating the exact same routine unless appropriate.
 • Includes accessory work for weak links.
 • Includes appropriate rest periods.
 • Includes a short warm-up.
