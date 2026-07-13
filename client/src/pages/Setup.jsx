@@ -37,7 +37,7 @@ export default function Setup() {
         mutationFn: createProfile,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['profile'] })
-            navigate('/dashboard')  
+            navigate('/dashboard')
         },
         onError: (error) => {
             console.error("Failed to save profile:", error);
@@ -63,48 +63,93 @@ export default function Setup() {
     if (profile) return null;
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>Setup Profile</h2>
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-6 py-12">
+            <div className="w-full max-w-md">
+                <h2 className="text-3xl font-black text-white mb-2">Set up your profile</h2>
+                <p className="text-zinc-500 text-sm mb-8">Tell us about yourself so we can build the right plan.</p>
 
-            <label>
-                Experience:
-                <select name="experience" value={formData.experience} onChange={handleChange} required>
-                    <option value="">Select level</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                </select>
-            </label>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-1">
+                        <label className="text-zinc-400 text-sm">Experience Level</label>
+                        <select
+                            name="experience"
+                            value={formData.experience}
+                            onChange={handleChange}
+                            required
+                            className="bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-zinc-600"
+                        >
+                            <option value="">Select level</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
 
-            <label>
-                Days Per Week:
-                <input type="number" name="days_per_week" value={formData.days_per_week} onChange={handleChange} min={1} max={7} required disabled={isPending} />
-            </label>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-zinc-400 text-sm">Training Days Per Week</label>
+                        <input
+                            type="number" name="days_per_week"
+                            value={formData.days_per_week}
+                            onChange={handleChange}
+                            min={1} max={7} required
+                            disabled={isPending}
+                            className="bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-zinc-600"
+                        />
+                    </div>
 
-            <label>
-                Session Duration (mins):
-                <input type="number" name="session_duration_minutes" value={formData.session_duration_minutes} onChange={handleChange} required disabled={isPending} />
-            </label>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-zinc-400 text-sm">Session Duration (minutes)</label>
+                        <input
+                            type="number" name="session_duration_minutes"
+                            value={formData.session_duration_minutes}
+                            onChange={handleChange} required
+                            disabled={isPending}
+                            className="bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-zinc-600"
+                        />
+                    </div>
 
-            <label>
-                Height (cm):
-                <input type="number" name="height_cm" value={formData.height_cm} onChange={handleChange} disabled={isPending} />
-            </label>
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="flex flex-col gap-1">
+                            <label className="text-zinc-400 text-sm">Height (cm)</label>
+                            <input
+                                type="number" name="height_cm"
+                                value={formData.height_cm}
+                                onChange={handleChange}
+                                disabled={isPending}
+                                className="bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-zinc-600"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-zinc-400 text-sm">Weight (kg)</label>
+                            <input
+                                type="number" name="weight_kg"
+                                value={formData.weight_kg}
+                                onChange={handleChange}
+                                disabled={isPending}
+                                className="bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-zinc-600"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-zinc-400 text-sm">Age</label>
+                            <input
+                                type="number" name="age"
+                                value={formData.age}
+                                onChange={handleChange}
+                                disabled={isPending}
+                                className="bg-zinc-900 border border-zinc-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-zinc-600"
+                            />
+                        </div>
+                    </div>
 
-            <label>
-                Weight (kg):
-                <input type="number" name="weight_kg" value={formData.weight_kg} onChange={handleChange} disabled={isPending} />
-            </label>
-
-            <label>
-                Age:
-                <input type="number" name="age" value={formData.age} onChange={handleChange} disabled={isPending} />
-            </label>
-
-            <button type="submit" disabled={isPending}>
-                {isPending ? 'Saving...' : 'Save Profile'}
-            </button>
-
-        </form>
+                    <button
+                        type="submit"
+                        disabled={isPending}
+                        className="mt-2 bg-white text-zinc-950 font-bold py-4 rounded-xl hover:bg-zinc-200 transition"
+                    >
+                        {isPending ? 'Saving...' : 'Save Profile'}
+                    </button>
+                </form>
+            </div>
+        </div>
     )
 }

@@ -29,27 +29,55 @@ export default function History() {
     if (error) return <p>Something went wrong.</p>;
 
     return (
-        <div>
-            <h2>Select a Skill</h2>
+        <div className="max-w-4xl mx-auto px-6 py-10">
+            <h1 className="text-3xl font-black text-white mb-2">History</h1>
+            <p className="text-zinc-500 text-sm mb-8">Review your past training sessions.</p>
 
-            {skills.map((skill) => (
-                <button
-                    key={skill.id}
-                    onClick={() => setSelectedSkillId(skill.id)}
-                >
-                    {skill.name}
-                </button>
-            ))}
+            <div className="flex gap-3 mb-8">
+                {skills.map((skill) => (
+                    <button
+                        key={skill.id}
+                        onClick={() => setSelectedSkillId(skill.id)}
+                        className={`px-5 py-2 rounded-xl font-medium text-sm transition
+                        ${selectedSkillId === skill.id
+                                ? 'bg-white text-zinc-950'
+                                : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
+                            }`}
+                    >
+                        {skill.name}
+                    </button>
+                ))}
+            </div>
 
-            {workoutsLoading && <p>Loading workouts...</p>}
+            {workoutsLoading && (
+                <p className="text-zinc-500 text-sm">Loading workouts...</p>
+            )}
 
-            {workouts.map((workout) => (
-                <div key={workout.id}>
-                    <h3>{new Date(workout.workout_date).toLocaleDateString()}</h3>
-                    <p>Duration: {workout.duration_minutes} min</p>
-                    <p>Notes: {workout.notes || "No notes"}</p>
-                </div>
-            ))}
+            {workouts.length === 0 && selectedSkillId && !workoutsLoading && (
+                <p className="text-zinc-500 text-sm">No workouts logged yet for this skill.</p>
+            )}
+
+            <div className="flex flex-col gap-4">
+                {workouts.map((workout) => (
+                    <div key={workout.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-white font-bold">
+                                {new Date(workout.workout_date).toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    month: 'short',
+                                    day: 'numeric'
+                                })}
+                            </h3>
+                            {workout.duration_minutes && (
+                                <span className="text-zinc-500 text-sm">{workout.duration_minutes} min</span>
+                            )}
+                        </div>
+                        {workout.notes && (
+                            <p className="text-zinc-400 text-sm">{workout.notes}</p>
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
-    );
+    )
 }

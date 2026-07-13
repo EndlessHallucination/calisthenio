@@ -58,58 +58,81 @@ export default function Workout() {
 
     if (error) return <p>Something went wrong.</p>;
     return (
-        <div>
-            <h2>Select a skill</h2>
+        <div className="max-w-4xl mx-auto px-6 py-10">
+            <h1 className="text-3xl font-black text-white mb-2">Log Workout</h1>
+            <p className="text-zinc-500 text-sm mb-8">Select a skill and log what you did.</p>
 
-            {skills.map(skill => (
-                <button
-                    key={skill.id}
-                    onClick={() => setSelectedSkillId(skill.id)}
-                    style={{ fontWeight: selectedSkillId === skill.id ? 'bold' : 'normal' }}
-                >
-                    {skill.name}
-                </button>
-            ))}
+            <div className="flex gap-3 mb-8">
+                {skills.map(skill => (
+                    <button
+                        key={skill.id}
+                        onClick={() => setSelectedSkillId(skill.id)}
+                        className={`px-5 py-2 rounded-xl font-medium text-sm transition
+                        ${selectedSkillId === skill.id
+                                ? 'bg-white text-zinc-950'
+                                : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
+                            }`}
+                    >
+                        {skill.name}
+                    </button>
+                ))}
+            </div>
+
             {routine && exerciseLogs.length > 0 && (
-                <div>
-                    <h2>Log Workout</h2>
-                    <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}>
+                    <div className="flex flex-col gap-4 mb-8">
                         {exerciseLogs.map((log, index) => (
-                            <div key={log.routine_exercise_id}><h3>{routine.exercises[index].exercise_name}</h3>
-
-                                <label>Sets
-                                    <input
-                                        type="number"
-                                        value={log.actual_sets}
-                                        onChange={(e) => handleChange(index, "actual_sets", Number(e.target.value))}
-                                    />
-                                </label>
-
-                                {routine.exercises[index].reps !== null && (
-                                    <label>Reps
+                            <div key={log.routine_exercise_id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+                                <h3 className="text-white font-bold mb-4">
+                                    {routine.exercises[index].exercise_name}
+                                </h3>
+                                <div className="flex gap-4">
+                                    <div className="flex flex-col gap-1 flex-1">
+                                        <label className="text-zinc-500 text-xs">Sets</label>
                                         <input
                                             type="number"
-                                            value={log.actual_reps ?? ''}
-                                            onChange={(e) => handleChange(index, "actual_reps", Number(e.target.value))}
+                                            value={log.actual_sets}
+                                            onChange={(e) => handleChange(index, "actual_sets", Number(e.target.value))}
+                                            className="bg-zinc-800 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-zinc-500"
                                         />
-                                    </label>
-                                )}
+                                    </div>
 
-                                {routine.exercises[index].hold_time_seconds !== null && (
-                                    <label>Hold (seconds)
-                                        <input
-                                            type="number"
-                                            value={log.actual_hold_time_seconds ?? ''}
-                                            onChange={(e) => handleChange(index, "actual_hold_time_seconds", Number(e.target.value))}
-                                        />
-                                    </label>
-                                )}
+                                    {routine.exercises[index].reps !== null && (
+                                        <div className="flex flex-col gap-1 flex-1">
+                                            <label className="text-zinc-500 text-xs">Reps</label>
+                                            <input
+                                                type="number"
+                                                value={log.actual_reps ?? ''}
+                                                onChange={(e) => handleChange(index, "actual_reps", Number(e.target.value))}
+                                                className="bg-zinc-800 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-zinc-500"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {routine.exercises[index].hold_time_seconds !== null && (
+                                        <div className="flex flex-col gap-1 flex-1">
+                                            <label className="text-zinc-500 text-xs">Hold (seconds)</label>
+                                            <input
+                                                type="number"
+                                                value={log.actual_hold_time_seconds ?? ''}
+                                                onChange={(e) => handleChange(index, "actual_hold_time_seconds", Number(e.target.value))}
+                                                className="bg-zinc-800 border border-zinc-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-zinc-500"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
-                        <button>Submit Workout</button>
-                    </form>
-                </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full bg-white text-zinc-950 font-bold py-4 rounded-xl hover:bg-zinc-200 transition"
+                    >
+                        Submit Workout
+                    </button>
+                </form>
             )}
         </div>
-    );
+    )
 } 

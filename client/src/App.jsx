@@ -18,6 +18,7 @@ function App() {
         <Route path="/workout" element={<><Nav /><Workout /></>} />
         <Route path="/history" element={<><Nav /><History /></>} />
       </Routes>
+
     </BrowserRouter>
   )
 }

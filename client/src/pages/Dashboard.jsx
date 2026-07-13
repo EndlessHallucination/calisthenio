@@ -20,17 +20,26 @@ export default function Dashboard() {
     if (isLoading) return <div>Loading...</div>;
 
     if (!skills || skills.length === 0) return (
-        <div>
-            <p>No active skills yet.</p>
-            <button onClick={() => navigate('/skills')}>Pick a skill</button>
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-6">
+            <div className="text-center">
+                <p className="text-zinc-500 mb-4">No active skills yet.</p>
+                <button
+                    onClick={() => navigate('/skills')}
+                    className="bg-white text-zinc-950 font-bold px-6 py-3 rounded-xl hover:bg-zinc-200 transition"
+                >
+                    Pick a skill
+                </button>
+            </div>
         </div>
     )
     return (
-        <div>
-            <h1>Dashboard</h1>
-            {skills.map(skill => (
-                <SkillCard key={skill.id} skill={skill} />
-            ))}
+        <div className="max-w-4xl mx-auto px-6 py-10">
+            <h1 className="text-3xl font-black text-white mb-8">Your Training</h1>
+            <div className="flex flex-col gap-6">
+                {skills.map(skill => (
+                    <SkillCard key={skill.id} skill={skill} />
+                ))}
+            </div>
         </div>
     )
 }
