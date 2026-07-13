@@ -22,6 +22,8 @@ app.use("/api/routines", routineRouter);
 
 app.use("/api/workouts", workoutRouter);
 
+app.use("/profile", profileRouter);
+
 app.get("/", (req, res) => {
   res.send("Hello");
 });

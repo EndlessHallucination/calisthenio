@@ -1,8 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-
+import { useEffect } from "react";
 
 import { getActiveSkills } from "../api/skills"
+
+import { getProfile } from "../api/profile";
 
 import SkillCard from '../components/SkillCard'
 
@@ -16,6 +18,19 @@ export default function Dashboard() {
         retry: false,
         throwOnError: false
     })
+
+    const { data: profile, isLoading: profileLoading } = useQuery({
+        queryKey: ['profile'],
+        queryFn: getProfile,
+        retry: false,
+        throwOnError: false
+    })
+
+    useEffect(() => {
+        if (!profileLoading && !profile) {
+            navigate('/setup')
+        }
+    }, [profile, profileLoading, navigate])
 
     if (isLoading) return <div>Loading...</div>;
 

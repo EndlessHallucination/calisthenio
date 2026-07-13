@@ -29,4 +29,24 @@ const getActiveSkills = async () => {
   return result.rows;
 };
 
-module.exports = { getAllSkills, getSkillById, getActiveSkills };
+const completeSkill = async (skillId) => {
+  const result = await db.query(
+    `
+UPDATE skill_progress
+
+SET
+status='completed',
+completed_at=NOW(),
+updated_at=NOW()
+
+WHERE skill_id=$1
+
+RETURNING *
+`,
+    [skillId],
+  );
+
+  return result.rows[0];
+};
+
+module.exports = { getAllSkills, getSkillById, getActiveSkills, completeSkill };

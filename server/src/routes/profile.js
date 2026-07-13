@@ -4,6 +4,11 @@ const router = express.Router();
 
 const { getProfile, createProfile } = require("../services/profileService");
 
+const {
+  getEquipment,
+  updateEquipment,
+} = require("../services/equipmentService");
+
 router.get("/", async (req, res) => {
   try {
     const result = await getProfile();
@@ -30,6 +35,30 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/equipment", async (req, res) => {
+  try {
+    const equipment = await getEquipment();
 
+    res.json(equipment);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+router.put("/equipment", async (req, res) => {
+  try {
+    const { equipmentIds } = req.body;
+
+    const result = await updateEquipment(equipmentIds);
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
 
 module.exports = router;

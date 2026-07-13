@@ -4,11 +4,14 @@ const router = express.Router();
 const db = require("../config/db");
 
 const { generateAndStoreRoutine } = require("../services/routineService");
+
 const {
   getAllSkills,
   getSkillById,
   getActiveSkills,
+  completeSkill,
 } = require("../services/skillService");
+
 const {
   startSkill,
   getCurrentMilestone,
@@ -23,12 +26,31 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 router.get("/active", async (req, res) => {
   try {
     const result = await getActiveSkills();
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch("/:id/complete", async (req, res) => {
+  try {
+    const skill = await completeSkill(req.params.id);
+
+    if (!skill) {
+      return res.status(404).json({
+        error: "Skill progress not found",
+      });
+    }
+
+    res.json(skill);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
   }
 });
 
