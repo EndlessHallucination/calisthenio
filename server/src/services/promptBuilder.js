@@ -6,6 +6,7 @@ function buildRoutinePrompt({
   completedMilestones,
   availableExercises,
   recentWorkouts,
+  equipment,
 }) {
   const completed =
     completedMilestones.length > 0
@@ -121,6 +122,15 @@ Use ONLY these exercises.
 ${exercises}
 
 Do NOT invent exercise names.
+
+
+=========================
+AVAILABLE EQUIPMENT
+=========================
+The athlete has access to:
+${equipment.length > 0 ? equipment.map((e) => `- ${e}`).join("\n") : "- Bodyweight only"}
+
+Only prescribe exercises that can be performed with this equipment.
 
 =========================
 COACHING PRINCIPLES

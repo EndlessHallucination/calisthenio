@@ -28,7 +28,7 @@ export default function SkillPicker() {
         mutationFn: startSkill,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['skills/active'] })
-            navigate('/')
+            navigate('/dashboard')
         },
         onError: (err) => {
             setError(err.response?.data?.error || 'Failed to start skill')

@@ -52,10 +52,6 @@ const generateAndStoreRoutine = async (skillId) => {
 
     const availableExercises = availableExercisesResult.rows;
 
-    // -------------------------------------------------------
-    // Fetch recent workouts (last 3) with their exercises
-    // -------------------------------------------------------
-
     const recentWorkoutsResult = await client.query(
       `
       SELECT
@@ -101,6 +97,15 @@ const generateAndStoreRoutine = async (skillId) => {
 
     const recentWorkouts = [...workoutsMap.values()];
 
+    const equipmentResult = await client.query(`
+      SELECT e.name
+      FROM equipment e
+      JOIN profile_equipment pe ON pe.equipment_id = e.id
+      WHERE pe.profile_id = 1
+    `);
+
+    const equipment = equipmentResult.rows.map((e) => e.name);
+
     const routinePrompt = buildRoutinePrompt({
       profile,
       skill,
@@ -109,6 +114,7 @@ const generateAndStoreRoutine = async (skillId) => {
       completedMilestones,
       availableExercises,
       recentWorkouts,
+      equipment,
     });
 
     const routineData = await generateRoutine(routinePrompt);

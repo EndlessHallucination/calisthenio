@@ -110,6 +110,17 @@ ON CONFLICT (skill_id, exercise_id, purpose) DO NOTHING
         exerciseMap["Dragon Flag Negatives"],
       ],
     );
+
+    await client.query(`
+  INSERT INTO equipment (name) VALUES
+  ('Pull-up Bar'),
+  ('Rings'),
+  ('Parallettes'),
+  ('Resistance Bands'),
+  ('Dip Bars'),
+  ('Floor')
+  ON CONFLICT (name) DO NOTHING
+`);
     await client.query("COMMIT");
     console.log("Skills seeded successfully.");
   } catch (err) {

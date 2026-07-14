@@ -1,18 +1,12 @@
 const db = require("../config/db");
 
 const getEquipment = async () => {
-  await client.query("COMMIT");
-
-  const result = await client.query(`
-    SELECT 
-        e.id,
-        e.name
+  const result = await db.query(`
+    SELECT e.id, e.name
     FROM equipment e
-    JOIN profile_equipment pe
-        ON e.id = pe.equipment_id
+    JOIN profile_equipment pe ON e.id = pe.equipment_id
     WHERE pe.profile_id = 1
-`);
-
+  `);
   return result.rows;
 };
 

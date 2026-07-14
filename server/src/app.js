@@ -6,6 +6,7 @@ const skillsRouter = require("./routes/skills");
 const profileRouter = require("./routes/profile");
 const routineRouter = require("./routes/routines");
 const workoutRouter = require("./routes/workouts");
+const equipmentRouter = require("./routes/equipment");
 
 app.use(express.json());
 
@@ -23,6 +24,8 @@ app.use("/api/routines", routineRouter);
 app.use("/api/workouts", workoutRouter);
 
 app.use("/profile", profileRouter);
+
+app.use("/api/equipment", equipmentRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello");
