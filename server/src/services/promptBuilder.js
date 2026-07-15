@@ -93,6 +93,17 @@ ${
 Focus on increasing strength, hold time, control and consistency.`
 }
 
+
+=========================
+CONCURRENT SKILLS
+=========================
+${
+  otherActiveSkills.length > 0
+    ? `The athlete is also training:\n${otherActiveSkills.map((s) => `- ${s.name} (${s.category})`).join("\n")}\n\nConsider recovery and avoid overloading the same muscle groups.`
+    : "No other skills currently being trained."
+}
+
+
 =========================
 COMPLETED MILESTONES
 =========================

@@ -16,3 +16,8 @@ export const getWorkouts = async (skillId) => {
   const { data } = await client.get(`/workouts?skill_id=${skillId}`);
   return data;
 };
+
+export const getWorkoutExercises = async (workoutId) => {
+  const { data } = await client.get(`/workouts/${workoutId}/exercises`);
+  return data;
+};

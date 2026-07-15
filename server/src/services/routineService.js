@@ -106,6 +106,19 @@ const generateAndStoreRoutine = async (skillId) => {
 
     const equipment = equipmentResult.rows.map((e) => e.name);
 
+    const activeSkillsResult = await client.query(
+      `
+  SELECT s.name, s.category
+  FROM skills s
+  JOIN skill_progress sp ON sp.skill_id = s.id
+  WHERE sp.status = 'active'
+  AND s.id != $1
+`,
+      [skillId],
+    );
+
+    const otherActiveSkills = activeSkillsResult.rows;
+
     const routinePrompt = buildRoutinePrompt({
       profile,
       skill,
@@ -115,6 +128,7 @@ const generateAndStoreRoutine = async (skillId) => {
       availableExercises,
       recentWorkouts,
       equipment,
+      otherActiveSkills,
     });
 
     const routineData = await generateRoutine(routinePrompt);

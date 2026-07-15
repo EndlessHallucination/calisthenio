@@ -73,8 +73,27 @@ const getWorkouts = async (skillId) => {
   return result.rows;
 };
 
+const getWorkoutExercises = async (workoutId) => {
+  const result = await db.query(
+    `
+    SELECT 
+      we.*,
+      e.name as exercise_name,
+      e.category
+    FROM workout_exercises we
+    JOIN routine_exercises re ON re.id = we.routine_exercise_id
+    JOIN exercises e ON e.id = re.exercise_id
+    WHERE we.workout_id = $1
+    ORDER BY we.id
+  `,
+    [workoutId],
+  );
+  return result.rows;
+};
+
 module.exports = {
   createWorkout,
   logExercises,
   getWorkouts,
+  getWorkoutExercises,
 };

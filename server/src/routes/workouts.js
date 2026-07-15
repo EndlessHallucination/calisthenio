@@ -6,6 +6,7 @@ const {
   createWorkout,
   logExercises,
   getWorkouts,
+  getWorkoutExercises,
 } = require("../services/workoutService");
 
 router.post("/", async (req, res) => {
@@ -35,6 +36,15 @@ router.get("/", async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/:id/exercises", async (req, res) => {
+  try {
+    const result = await getWorkoutExercises(req.params.id);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

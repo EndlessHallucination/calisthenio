@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { getActiveSkills } from "../api/skills";
-import { getWorkouts } from "../api/workouts";
+import { getWorkouts, getWorkoutExercises } from "../api/workouts";
 
 export default function History() {
     const [selectedSkillId, setSelectedSkillId] = useState(null);
+    const [selectedWorkoutId, setSelectedWorkoutId] = useState(null)
+
+
 
     const {
         data: skills = [],
@@ -24,6 +27,13 @@ export default function History() {
         queryFn: () => getWorkouts(selectedSkillId),
         enabled: !!selectedSkillId,
     });
+
+
+    const { data: workoutExercises = [] } = useQuery({
+        queryKey: ['workoutExercises', selectedWorkoutId],
+        queryFn: () => getWorkoutExercises(selectedWorkoutId),
+        enabled: !!selectedWorkoutId
+    })
 
     if (isLoading) return <p>Loading...</p>;
     if (error) return <p>Something went wrong.</p>;
@@ -60,20 +70,43 @@ export default function History() {
             <div className="flex flex-col gap-4">
                 {workouts.map((workout) => (
                     <div key={workout.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
-                        <div className="flex items-center justify-between mb-2">
+                        <div
+                            className="flex items-center justify-between cursor-pointer"
+                            onClick={() => setSelectedWorkoutId(
+                                selectedWorkoutId === workout.id ? null : workout.id
+                            )}
+                        >
                             <h3 className="text-white font-bold">
                                 {new Date(workout.workout_date).toLocaleDateString('en-US', {
-                                    weekday: 'long',
-                                    month: 'short',
-                                    day: 'numeric'
+                                    weekday: 'long', month: 'short', day: 'numeric'
                                 })}
                             </h3>
-                            {workout.duration_minutes && (
-                                <span className="text-zinc-500 text-sm">{workout.duration_minutes} min</span>
-                            )}
+                            <div className="flex items-center gap-3">
+                                {workout.duration_minutes && (
+                                    <span className="text-zinc-500 text-sm">{workout.duration_minutes} min</span>
+                                )}
+                                <span className="text-zinc-500 text-sm">
+                                    {selectedWorkoutId === workout.id ? '▲' : '▼'}
+                                </span>
+                            </div>
                         </div>
-                        {workout.notes && (
-                            <p className="text-zinc-400 text-sm">{workout.notes}</p>
+
+                        {selectedWorkoutId === workout.id && (
+                            <div className="mt-4 border-t border-zinc-800 pt-4">
+                                {workoutExercises.map(ex => (
+                                    <div key={ex.id} className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0">
+                                        <div>
+                                            <p className="text-white text-sm font-medium">{ex.exercise_name}</p>
+                                            <p className="text-zinc-500 text-xs">{ex.category}</p>
+                                        </div>
+                                        <p className="text-zinc-400 text-sm">
+                                            {ex.actual_sets} sets
+                                            {ex.actual_reps ? ` × ${ex.actual_reps}` : ''}
+                                            {ex.actual_hold_time_seconds ? ` × ${ex.actual_hold_time_seconds}s` : ''}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </div>
                 ))}
