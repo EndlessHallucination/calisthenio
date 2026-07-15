@@ -89,7 +89,17 @@ export default function History() {
                                     {selectedWorkoutId === workout.id ? '▲' : '▼'}
                                 </span>
                             </div>
+
                         </div>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                if (confirm('Delete this workout?')) deleteWorkout(workout.id)
+                            }}
+                            className="text-zinc-600 hover:text-red-400 text-xs transition"
+                        >
+                            Delete
+                        </button>
 
                         {selectedWorkoutId === workout.id && (
                             <div className="mt-4 border-t border-zinc-800 pt-4">

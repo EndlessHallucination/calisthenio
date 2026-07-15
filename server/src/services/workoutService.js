@@ -9,6 +9,18 @@ const createWorkout = async (skillId, date, durationMinutes, notes) => {
   const skillProgressId = progressResult.rows[0]?.id;
   if (!skillProgressId) throw new Error("Skill not started");
 
+  // check if already logged today
+  const existing = await db.query(
+    `
+    SELECT w.id FROM workouts w
+    WHERE w.skill_progress_id = $1
+    AND w.workout_date = CURRENT_DATE
+  `,
+    [skillProgressId],
+  );
+
+  const alreadyLoggedToday = existing.rows.length > 0;
+
   const result = await db.query(
     `INSERT INTO workouts (skill_progress_id, workout_date, duration_minutes, notes)
      VALUES ($1, $2, $3, $4)
@@ -16,7 +28,7 @@ const createWorkout = async (skillId, date, durationMinutes, notes) => {
     [skillProgressId, date || new Date(), durationMinutes, notes],
   );
 
-  return result.rows[0];
+  return { ...result.rows[0], alreadyLoggedToday };
 };
 
 const logExercises = async (workoutId, exercises) => {
@@ -90,10 +102,18 @@ const getWorkoutExercises = async (workoutId) => {
   );
   return result.rows;
 };
+const deleteWorkout = async (workoutId) => {
+  await db.query("DELETE FROM workout_exercises WHERE workout_id = $1", [
+    workoutId,
+  ]);
+  await db.query("DELETE FROM workouts WHERE id = $1", [workoutId]);
+  return { deleted: true };
+};
 
 module.exports = {
   createWorkout,
   logExercises,
   getWorkouts,
   getWorkoutExercises,
+  deleteWorkout,
 };

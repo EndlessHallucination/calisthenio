@@ -52,11 +52,16 @@ export default function Workout() {
         ))
     }
 
+    const [warning, setWarning] = useState(null)
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true)
         try {
             const workout = await createWorkout(selectedSkillId);
+            if (workout.alreadyLoggedToday) {
+                setWarning('You already logged a workout for this skill today.')
+            }
             await logExercises(workout.id, exerciseLogs);
             setSubmitted(true)
             setTimeout(() => navigate('/dashboard'), 1500)
@@ -190,6 +195,9 @@ export default function Workout() {
                     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center">
                         <p className="text-4xl mb-3">✓</p>
                         <p className="text-white font-bold text-xl">Workout Logged</p>
+                        {warning && (
+                            <p className="text-yellow-400 text-sm mt-2">{warning}</p>
+                        )}
                     </div>
                 </div>
             )}

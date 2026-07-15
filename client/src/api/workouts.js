@@ -21,3 +21,8 @@ export const getWorkoutExercises = async (workoutId) => {
   const { data } = await client.get(`/workouts/${workoutId}/exercises`);
   return data;
 };
+
+export const deleteWorkout = async (workoutId) => {
+  const { data } = await client.delete(`/workouts/${workoutId}`);
+  return data;
+};
