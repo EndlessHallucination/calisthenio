@@ -51,11 +51,8 @@ router.get("/:id/exercises", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    await db.query("DELETE FROM workout_exercises WHERE workout_id = $1", [
-      req.params.id,
-    ]);
-    await db.query("DELETE FROM workouts WHERE id = $1", [req.params.id]);
-    res.json({ deleted: true });
+    const result = await deleteWorkout(req.params.id);
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

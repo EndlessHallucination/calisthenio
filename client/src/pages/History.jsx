@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { getActiveSkills } from "../api/skills";
-import { getWorkouts, getWorkoutExercises } from "../api/workouts";
+import { getWorkouts, getWorkoutExercises, deleteWorkout } from "../api/workouts";
 
 export default function History() {
     const [selectedSkillId, setSelectedSkillId] = useState(null);
     const [selectedWorkoutId, setSelectedWorkoutId] = useState(null)
-
+    const queryClient = useQueryClient()
 
 
     const {
@@ -28,6 +28,13 @@ export default function History() {
         enabled: !!selectedSkillId,
     });
 
+    const { mutate: removeWorkout } = useMutation({
+        mutationFn: deleteWorkout,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workoutHistory', selectedSkillId] })
+            setSelectedWorkoutId(null)
+        }
+    })
 
     const { data: workoutExercises = [] } = useQuery({
         queryKey: ['workoutExercises', selectedWorkoutId],
@@ -94,7 +101,7 @@ export default function History() {
                         <button
                             onClick={(e) => {
                                 e.stopPropagation()
-                                if (confirm('Delete this workout?')) deleteWorkout(workout.id)
+                                if (confirm('Delete this workout?')) removeWorkout(workout.id)
                             }}
                             className="text-zinc-600 hover:text-red-400 text-xs transition"
                         >

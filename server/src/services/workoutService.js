@@ -102,6 +102,7 @@ const getWorkoutExercises = async (workoutId) => {
   );
   return result.rows;
 };
+
 const deleteWorkout = async (workoutId) => {
   await db.query("DELETE FROM workout_exercises WHERE workout_id = $1", [
     workoutId,
