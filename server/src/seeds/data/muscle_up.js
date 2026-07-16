@@ -21,20 +21,58 @@ module.exports = async function seedMuscleUp(client) {
 
   await client.query(
     `
-    INSERT INTO milestones (skill_id, name, sequence, hold_time_seconds, description, notes)
-    VALUES
-      ($1, 'Pull-up', 1, NULL, 'Perform a strict pull-up with full range of motion from dead hang to chin over bar.', 'Build pulling strength and control before progressing.'),
-      ($1, 'Chest-to-Bar Pull-up', 2, NULL, 'Pull explosively until the chest reaches the bar.', 'Focus on generating vertical pulling power.'),
-      ($1, 'Muscle-Up Negative', 3, NULL, 'Start above the bar and slowly lower through the transition into a hanging position.', 'Develop control through the hardest part of the movement.'),
-      ($1, 'Kipping Muscle-Up', 4, NULL, 'Perform a muscle-up using controlled momentum from the kip.', 'Learn the transition and movement pattern before strict strength.'),
-      ($1, 'Muscle-Up', 5, NULL, 'Perform a clean muscle-up transitioning from below the bar into the top support position.', 'Main milestone. Focus on explosive pull, fast transition, and stable lockout.'),
-      ($1, 'Wide Muscle-Up', 6, NULL, 'Perform a muscle-up with a wider grip requiring greater pulling strength.', 'Maintain explosive power while adapting to the wider grip.'),
-      ($1, 'Strict Bar Muscle-Up', 7, NULL, 'Perform a muscle-up without momentum using pure pulling and pushing strength.', 'Requires strong chest-to-bar pull-ups and controlled transition.'),
-      ($1, 'L-Sit Muscle-Up', 8, NULL, 'Perform a muscle-up while maintaining an L-sit position throughout the movement.', 'Requires high core tension and strict strength.'),
-      ($1, 'One Arm Straight Muscle-Up', 9, NULL, 'Perform a muscle-up using one arm with a straight-arm transition.', 'Elite level skill requiring extreme pulling strength.'),
-      ($1, 'High One Arm Pull-up', 10, NULL, 'Perform a one arm pull-up with enough height to support advanced muscle-up variations.', 'Prerequisite for one arm straight muscle-up.')
-    ON CONFLICT (skill_id, sequence) DO NOTHING
-  `,
+  INSERT INTO milestones (
+    skill_id,
+    name,
+    sequence,
+    hold_time_seconds,
+    reps_required,
+    description,
+    notes
+  )
+  VALUES
+    ($1, 'Pull-up', 1, NULL, 5,
+      'Perform 5 strict pull-ups with full range of motion from dead hang to chin over bar.',
+      'Build foundational pulling strength and control before progressing.'),
+
+    ($1, 'Chest-to-Bar Pull-up', 2, NULL, 5,
+      'Perform 5 explosive chest-to-bar pull-ups where the chest reaches the bar.',
+      'Focus on powerful vertical pulling and keeping the movement controlled.'),
+
+    ($1, 'Muscle-Up Negative', 3, NULL, 3,
+      'Perform 3 controlled negative muscle-ups from the top position through the transition.',
+      'Develop strength and control in the transition phase.'),
+
+    ($1, 'Kipping Muscle-Up', 4, NULL, 3,
+      'Perform 3 kipping muscle-ups with a controlled transition over the bar.',
+      'Learn the movement pattern before building strict strength.'),
+
+    ($1, 'Muscle-Up', 5, NULL, 1,
+      'Perform 1 clean muscle-up transitioning from below the bar into a stable top support position.',
+      'Main milestone. Prioritize explosive pulling, fast transition, and strong lockout.'),
+
+    ($1, 'Wide Muscle-Up', 6, NULL, 3,
+      'Perform 3 muscle-ups using a wider grip position.',
+      'Requires greater pulling strength due to reduced mechanical advantage.'),
+
+    ($1, 'Strict Bar Muscle-Up', 7, NULL, 3,
+      'Perform 3 strict muscle-ups without momentum or kipping.',
+      'Requires powerful chest-to-bar pulling strength and controlled transition.'),
+
+    ($1, 'L-Sit Muscle-Up', 8, NULL, 3,
+      'Perform 3 muscle-ups while maintaining an L-sit position throughout the movement.',
+      'Requires advanced core tension and strict pulling strength.'),
+
+    ($1, 'One Arm Straight Muscle-Up', 9, NULL, 1,
+      'Perform 1 one-arm straight muscle-up with controlled transition.',
+      'Elite skill requiring exceptional pulling and straight-arm strength.'),
+
+    ($1, 'High One Arm Pull-up', 10, NULL, 1,
+      'Perform 1 high one-arm pull-up with enough height to support advanced muscle-up variations.',
+      'Prerequisite movement for one-arm straight muscle-up progression.')
+
+  ON CONFLICT (skill_id, sequence) DO NOTHING
+`,
     [skillId],
   );
 
