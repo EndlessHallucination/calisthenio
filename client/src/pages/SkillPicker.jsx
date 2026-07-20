@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
-import { getSkills, startSkill, getActiveSkills } from "../api/skills"
+import { getSkills, startSkill, getActiveSkills, getCompletedSkills, restartSkill } from "../api/skills"
 import { getProfileEquipment } from '../api/equipment'
 
 export default function SkillPicker() {
@@ -15,9 +15,14 @@ export default function SkillPicker() {
         throwOnError: false
     })
 
-    const { data: activeSkills } = useQuery({
+    const { data: activeSkills = [] } = useQuery({
         queryKey: ['skills/active'],
         queryFn: getActiveSkills
+    })
+
+    const { data: completedSkills = [] } = useQuery({
+        queryKey: ['skills/completed'],
+        queryFn: getCompletedSkills
     })
 
     const { data: userEquipment = [] } = useQuery({
@@ -42,6 +47,22 @@ export default function SkillPicker() {
         mutate(skillId)
     }
 
+    const { mutate: restart, isPending: isRestarting } = useMutation({
+        mutationFn: restartSkill,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['skills/active'] })
+            queryClient.invalidateQueries({ queryKey: ['skills/completed'] })
+            navigate('/dashboard')
+        },
+        onError: (err) => {
+            setError(err.response?.data?.error || 'Failed to restart skill')
+        }
+    })
+
+    const handleRestart = (skillId) => {
+        restart(skillId)
+    }
+
     if (isLoading) return <div>Loading...</div>;
 
     return (
@@ -56,6 +77,7 @@ export default function SkillPicker() {
             <div className="grid grid-cols-1 gap-4">
                 {skills && skills.map(skill => {
                     const isActive = activeSkills?.some(s => s.id === skill.id)
+                    const isCompleted = completedSkills?.some(s => s.id === skill.id)
                     const userEquipmentNames = userEquipment.map(e => e.name)
                     const missing = (skill.required_equipment || []).filter(
                         e => !userEquipmentNames.includes(e)
@@ -76,15 +98,17 @@ export default function SkillPicker() {
                                 )}
                             </div>
                             <button
-                                onClick={() => handleStart(skill.id)}
+                                onClick={() => isCompleted ? handleRestart(skill.id) : handleStart(skill.id)}
                                 disabled={isActive || isPending}
                                 className={`px-5 py-2 rounded-xl font-medium text-sm transition
-                                ${isActive
+                            ${isActive
                                         ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                                        : 'bg-white text-zinc-950 hover:bg-zinc-200'
+                                        : isCompleted
+                                            ? 'bg-zinc-800 text-green-500 hover:text-white hover:bg-zinc-700'
+                                            : 'bg-white text-zinc-950 hover:bg-zinc-200'
                                     }`}
                             >
-                                {isActive ? 'In Progress' : 'Start Learning'}
+                                {isActive ? 'In Progress' : isCompleted ? '↺ Restart' : 'Start Learning'}
                             </button>
                         </div>
                     )

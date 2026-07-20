@@ -214,8 +214,9 @@ All numeric values must be whole integers. Do NOT use decimals or floats.
 
 Use this exact schema:
 
-hold_seconds MUST be a single integer or null. NEVER include text or ranges in this field.
-
+For exercises that use repetitions, reps must be a string like "8" or "8-10". Never null for rep-based exercises.
+For exercises that use holds, hold_seconds must be an integer. Never null for hold-based exercises.
+One of reps or hold_seconds must always be provided. Never both null.
 {
   "title": "string",
   "goal": "string",

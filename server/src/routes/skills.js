@@ -9,7 +9,9 @@ const {
   getAllSkills,
   getSkillById,
   getActiveSkills,
+  getCompletedSkills,
   completeSkill,
+  restartSkill,
 } = require("../services/skillService");
 
 const {
@@ -30,6 +32,15 @@ router.get("/", async (req, res) => {
 router.get("/active", async (req, res) => {
   try {
     const result = await getActiveSkills();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/completed", async (req, res) => {
+  try {
+    const result = await getCompletedSkills();
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -119,6 +130,16 @@ router.post("/:id/milestones/:milestoneId/complete", async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch("/:id/restart", async (req, res) => {
+  try {
+    const result = await restartSkill(req.params.id);
+    if (!result) return res.status(404).json({ error: "Skill not found" });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
