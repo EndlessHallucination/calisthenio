@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCurrentMilestone, completeMilestone, getSkill } from "../api/skills"
 import { getActiveRoutine, generateRoutine } from "../api/routines";
 
 const SkillCard = ({ skill }) => {
+    const [expanded, setExpanded] = useState(false)
     const queryClient = useQueryClient()
 
     const { data: milestone } = useQuery({
@@ -28,10 +30,10 @@ const SkillCard = ({ skill }) => {
     })
 
     const { mutate: complete, isPending: isCompleting } = useMutation({
-        mutationFn: () => completeMilestone(skill.id, milestone.id),
+        mutationFn: () => completeMilestone(skill.id, milestone?.id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['milestone', skill.id] }),
-                queryClient.invalidateQueries({ queryKey: ['routine', skill.id] })
+            queryClient.invalidateQueries({ queryKey: ['milestone', skill.id] })
+            queryClient.invalidateQueries({ queryKey: ['routine', skill.id] })
         }
     })
 
@@ -42,73 +44,111 @@ const SkillCard = ({ skill }) => {
         return acc
     }, {}) || {}
 
+    const totalMilestones = skillDetail?.milestones?.length || 0
+    const currentSequence = milestone?.sequence || 0
+    const progress = totalMilestones > 0 ? ((currentSequence - 1) / totalMilestones) * 100 : 0
+
     return (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-            <div className="flex items-start justify-between mb-6">
-                <div>
-                    <h2 className="text-2xl font-black text-white">{skill.name}</h2>
-                    {skillDetail && milestone && (
-                        <p className="text-zinc-500 text-sm mt-1">
-                            Step {milestone.sequence} of {skillDetail.milestones.length}
-                        </p>
-                    )}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+
+            {/* Header — always visible */}
+            <div
+                className="p-6 cursor-pointer"
+                onClick={() => setExpanded(!expanded)}
+            >
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-xl font-black text-white">{skill.name}</h2>
+                    <span className="text-zinc-500 text-sm">{expanded ? '▲' : '▼'}</span>
                 </div>
+
+                {/* Progress bar */}
+                {totalMilestones > 0 && (
+                    <div className="mb-3">
+                        <div className="flex justify-between text-xs text-zinc-500 mb-1">
+                            <span>Step {currentSequence} of {totalMilestones}</span>
+                            <span>{Math.round(progress)}%</span>
+                        </div>
+                        <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-white rounded-full transition-all duration-500"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Current milestone — compact */}
+                {milestone && (
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-zinc-500 text-xs">Current</p>
+                            <p className="text-white text-sm font-medium">{milestone.name}</p>
+                        </div>
+                        {milestone.hold_time_seconds && (
+                            <span className="text-zinc-400 text-xs bg-zinc-800 px-2 py-1 rounded-lg">
+                                {milestone.hold_time_seconds}s hold
+                            </span>
+                        )}
+                        {milestone.reps_required && (
+                            <span className="text-zinc-400 text-xs bg-zinc-800 px-2 py-1 rounded-lg">
+                                {milestone.reps_required} reps
+                            </span>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {milestone && (
-                <div className="bg-zinc-800 rounded-xl p-4 mb-6">
-                    <p className="text-zinc-400 text-xs uppercase tracking-widest mb-1">Current Milestone</p>
-                    <p className="text-white font-bold text-lg">{milestone.name}</p>
-                    {milestone.hold_time_seconds && (
-                        <p className="text-zinc-400 text-sm mt-1">Target: {milestone.hold_time_seconds}s hold</p>
-                    )}
-                    {milestone.reps_required && (
-                        <p className="text-zinc-400 text-sm mt-1">Target: {milestone.reps_required} reps</p>
-                    )}
-                    <button
-                        onClick={() => complete()}
-                        disabled={isCompleting}
-                        className="mt-4 bg-white text-zinc-950 font-bold px-4 py-2 rounded-lg text-sm hover:bg-zinc-200 transition disabled:opacity-50"
-                    >
-                        {isCompleting ? 'Completing...' : '✓ Complete Milestone'}
-                    </button>
-                </div>
-            )}
+            {/* Expanded content */}
+            {expanded && (
+                <div className="border-t border-zinc-800 p-6">
 
-            {routine ? (
-                <div>
-                    <p className="text-zinc-500 text-xs uppercase tracking-widest mb-3">Today's Routine</p>
-                    <div className="flex flex-col gap-2">
-                        {Object.entries(sections).map(([sectionName, sectionExercises]) => (
-                            <div key={sectionName} className="mb-4">
-                                <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">{sectionName}</p>
-                                {sectionExercises.map(ex => (
-                                    <div key={ex.id} className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0">
-                                        <div>
-                                            <p className="text-white text-sm font-medium">{ex.exercise_name}</p>
-                                            <p className="text-zinc-500 text-xs">{ex.category}</p>
+                    {/* Complete milestone button */}
+                    {milestone && (
+                        <button
+                            onClick={() => complete()}
+                            disabled={isCompleting}
+                            className="w-full mb-6 bg-white text-zinc-950 font-bold py-3 rounded-xl hover:bg-zinc-200 transition disabled:opacity-50 text-sm"
+                        >
+                            {isCompleting ? 'Completing...' : '✓ Complete Milestone'}
+                        </button>
+                    )}
+
+                    {/* Routine */}
+                    {routine ? (
+                        <div>
+                            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-4">Today's Routine</p>
+                            {Object.entries(sections).map(([sectionName, sectionExercises]) => (
+                                <div key={sectionName} className="mb-4">
+                                    <p className="text-zinc-600 text-xs uppercase tracking-widest mb-2">{sectionName}</p>
+                                    {sectionExercises.map(ex => (
+                                        <div key={ex.id} className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0">
+                                            <div>
+                                                <p className="text-white text-sm font-medium">{ex.exercise_name}</p>
+                                                <p className="text-zinc-600 text-xs">{ex.category}</p>
+                                            </div>
+                                            <p className="text-zinc-400 text-sm text-right">
+                                                {ex.sets} sets
+                                                {ex.reps ? ` × ${ex.reps}` : ''}
+                                                {ex.hold_time_seconds ? ` × ${ex.hold_time_seconds}s` : ''}
+                                            </p>
                                         </div>
-                                        <p className="text-zinc-400 text-sm text-right">
-                                            {ex.sets} sets
-                                            {ex.reps ? ` × ${ex.reps}` : ''}
-                                            {ex.hold_time_seconds ? ` × ${ex.hold_time_seconds}s` : ''}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        ))}
-                    </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => generate()}
+                            disabled={isGenerating}
+                            className="w-full border border-zinc-700 text-zinc-300 font-medium py-3 rounded-xl hover:border-zinc-500 hover:text-white transition disabled:opacity-50 text-sm"
+                        >
+                            {isGenerating ? 'Generating...' : '+ Generate Routine'}
+                        </button>
+                    )}
                 </div>
-            ) : (
-                <button
-                    onClick={() => generate()}
-                    disabled={isGenerating}
-                    className="w-full border border-zinc-700 text-zinc-300 font-medium py-3 rounded-xl hover:border-zinc-500 hover:text-white transition disabled:opacity-50 text-sm"
-                >
-                    {isGenerating ? 'Generating...' : '+ Generate Routine'}
-                </button>
             )}
         </div>
     )
 }
-export default SkillCard;
+
+export default SkillCard

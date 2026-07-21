@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getProfile } from '../api/profile'
 import { getEquipment, getProfileEquipment } from '../api/equipment'
+import { getActiveSkills, getCompletedSkills } from '../api/skills'
 import ProfileForm from '../components/ProfileForm'
 import EquipmentForm from '../components/EquipmentForm'
 
@@ -17,6 +18,17 @@ export default function Profile() {
     const { data: equipment = [] } = useQuery({
         queryKey: ['profile/equipment'],
         queryFn: getProfileEquipment
+    })
+
+
+    const { data: activeSkills = [] } = useQuery({
+        queryKey: ['skills/active'],
+        queryFn: getActiveSkills
+    })
+
+    const { data: completedSkills = [] } = useQuery({
+        queryKey: ['skills/completed'],
+        queryFn: getCompletedSkills
     })
 
     if (isLoading) return <div>Loading...</div>
@@ -65,6 +77,39 @@ export default function Profile() {
                     </div>
                 )
             }
+            {(activeSkills.length > 0 || completedSkills.length > 0) && (
+                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mt-6">
+                    <h2 className="text-white font-bold mb-4">Skills</h2>
+
+                    {activeSkills.length > 0 && (
+                        <div className="mb-4">
+                            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Active</p>
+                            <div className="flex flex-col gap-2">
+                                {activeSkills.map(s => (
+                                    <div key={s.id} className="flex items-center justify-between">
+                                        <p className="text-white text-sm">{s.name}</p>
+                                        <span className="text-zinc-500 text-xs capitalize">{s.difficulty}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {completedSkills.length > 0 && (
+                        <div>
+                            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Completed</p>
+                            <div className="flex flex-col gap-2">
+                                {completedSkills.map(s => (
+                                    <div key={s.id} className="flex items-center justify-between">
+                                        <p className="text-white text-sm">{s.name}</p>
+                                        <span className="text-green-500 text-xs">✓</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     )
 }
