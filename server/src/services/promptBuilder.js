@@ -59,6 +59,11 @@ function buildRoutinePrompt({
           .join("\n")
       : "- None";
 
+  const cooldownExercises = generalExercises
+    .filter((e) => e.category === "mobility")
+    .map((e) => `- ${e.name}`)
+    .join("\n");
+
   return `
 You are an elite calisthenics coach specializing in bodyweight strength, skill progression, and injury prevention.
 
@@ -93,14 +98,26 @@ CURRENT PROGRESSION
 
 Current Milestone:
 • ${currentMilestone.name}
-• Required Hold: ${currentMilestone.hold_time_seconds} seconds
+${
+  currentMilestone.hold_time_seconds
+    ? `• Required Hold: ${currentMilestone.hold_time_seconds} seconds`
+    : currentMilestone.reps_required
+      ? `• Required Reps: ${currentMilestone.reps_required}`
+      : ""
+}
 • Progression Stage: ${currentMilestone.sequence}
 
 ${
   nextMilestone
     ? `Next Milestone:
 • ${nextMilestone.name}
-• Required Hold: ${nextMilestone.hold_time_seconds} seconds`
+${
+  nextMilestone.hold_time_seconds
+    ? `• Required Hold: ${nextMilestone.hold_time_seconds} seconds`
+    : nextMilestone.reps_required
+      ? `• Required Reps: ${nextMilestone.reps_required}`
+      : ""
+}`
     : `The athlete has already reached the final milestone.
 Focus on increasing strength, hold time, control and consistency.`
 }
@@ -122,6 +139,14 @@ Use these for warmup and cooldown only.
 Do NOT use these as main skill work.
 
 ${general}
+
+=========================
+COOLDOWN EXERCISES
+=========================
+Use ONLY these exercises for cooldown.
+Do NOT use any other exercises in cooldown.
+
+${cooldownExercises}
 
 =========================
 COMPLETED MILESTONES
@@ -182,6 +207,10 @@ Create a routine that:
 • Includes a short cooldown.
 • Avoids unnecessary exercises.
 • Uses only exercises from the provided list.
+• Cooldown must include ONLY static stretches and mobility work.
+• No strength exercises, push-ups, squats, or skill work in cooldown.
+• Each cooldown exercise should be held for 30-60 seconds.
+• Include 2-3 cooldown exercises targeting muscles used in the session.
 
 =========================
 ROUTINE STRUCTURE
@@ -205,7 +234,6 @@ Do NOT explain your decisions.
 
 Do NOT include text before or after the JSON.
 
-
 Do NOT add suffixes like "(Assisted)", "(Modified)", or "(Band)" to exercise names.
 
 Use ONLY the exact exercise names from the provided lists.
@@ -214,9 +242,10 @@ All numeric values must be whole integers. Do NOT use decimals or floats.
 
 Use this exact schema:
 
-For exercises that use repetitions, reps must be a string like "8" or "8-10". Never null for rep-based exercises.
-For exercises that use holds, hold_seconds must be an integer. Never null for hold-based exercises.
-One of reps or hold_seconds must always be provided. Never both null.
+For mobility and stretching exercises, hold_seconds should be 20-60 seconds.
+For strength exercises, either reps or hold_seconds must be provided.
+rest_seconds must always be provided for every exercise.
+
 {
   "title": "string",
   "goal": "string",

@@ -74,13 +74,7 @@ const generateAndStoreRoutine = async (skillId) => {
           console.warn(`Exercise "${exercise.exercise}" not found.`);
           continue;
         }
-        if (!exercise.reps && !exercise.hold_seconds) {
-          console.warn(
-            `Exercise "${exercise.exercise}" has no reps or hold time, skipping.`,
-          );
-          continue;
-        }
-        
+
         await client.query(
           `INSERT INTO routine_exercises (
             routine_id, exercise_id, order_index, sets, reps,

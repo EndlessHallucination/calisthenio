@@ -1,10 +1,14 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCurrentMilestone, completeMilestone, getSkill } from "../api/skills"
 import { getActiveRoutine, generateRoutine } from "../api/routines";
 
 const SkillCard = ({ skill }) => {
     const [expanded, setExpanded] = useState(false)
+    const navigate = useNavigate()
+
     const queryClient = useQueryClient()
 
     const { data: milestone } = useQuery({
@@ -101,21 +105,28 @@ const SkillCard = ({ skill }) => {
             {/* Expanded content */}
             {expanded && (
                 <div className="border-t border-zinc-800 p-6">
-
-                    {/* Complete milestone button */}
-                    {milestone && (
-                        <button
-                            onClick={() => complete()}
-                            disabled={isCompleting}
-                            className="w-full mb-6 bg-white text-zinc-950 font-bold py-3 rounded-xl hover:bg-zinc-200 transition disabled:opacity-50 text-sm"
-                        >
-                            {isCompleting ? 'Completing...' : '✓ Complete Milestone'}
-                        </button>
-                    )}
-
-                    {/* Routine */}
                     {routine ? (
-                        <div>
+                        <>
+                            {/* Primary action */}
+                            <button
+                                onClick={() => navigate(`/workout?skill_id=${skill.id}`)}
+                                className="w-full mb-3 bg-white text-zinc-950 font-bold py-3 rounded-xl hover:bg-zinc-200 transition text-sm"
+                            >
+                                → Start Workout
+                            </button>
+
+                            {/* Secondary action */}
+                            {milestone && (
+                                <button
+                                    onClick={() => complete()}
+                                    disabled={isCompleting}
+                                    className="w-full mb-6 border border-zinc-700 text-zinc-400 font-medium py-3 rounded-xl hover:border-white hover:text-white transition disabled:opacity-50 text-sm"
+                                >
+                                    {isCompleting ? 'Completing...' : '✓ Complete Milestone'}
+                                </button>
+                            )}
+
+                            {/* Routine display */}
                             <p className="text-zinc-500 text-xs uppercase tracking-widest mb-4">Today's Routine</p>
                             {Object.entries(sections).map(([sectionName, sectionExercises]) => (
                                 <div key={sectionName} className="mb-4">
@@ -135,12 +146,12 @@ const SkillCard = ({ skill }) => {
                                     ))}
                                 </div>
                             ))}
-                        </div>
+                        </>
                     ) : (
                         <button
                             onClick={() => generate()}
                             disabled={isGenerating}
-                            className="w-full border border-zinc-700 text-zinc-300 font-medium py-3 rounded-xl hover:border-zinc-500 hover:text-white transition disabled:opacity-50 text-sm"
+                            className="w-full bg-white text-zinc-950 font-bold py-3 rounded-xl hover:bg-zinc-200 transition disabled:opacity-50 text-sm"
                         >
                             {isGenerating ? 'Generating...' : '+ Generate Routine'}
                         </button>
