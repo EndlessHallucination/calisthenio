@@ -146,6 +146,12 @@ const SkillCard = ({ skill }) => {
                                     ))}
                                 </div>
                             ))}
+                            {routine.coach_notes && (
+                                <div className="mt-4 pt-4 border-t border-zinc-800">
+                                    <p className="text-zinc-500 text-xs uppercase tracking-widest mb-2">Coach Notes</p>
+                                    <p className="text-zinc-300 text-sm leading-relaxed">{routine.coach_notes}</p>
+                                </div>
+                            )}
                         </>
                     ) : (
                         <button

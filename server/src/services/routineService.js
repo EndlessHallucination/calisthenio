@@ -59,9 +59,9 @@ const generateAndStoreRoutine = async (skillId) => {
     const nextVersion = versionResult.rows[0].next_version;
 
     const routineResult = await client.query(
-      `INSERT INTO routines (skill_progress_id, version, is_active)
-       VALUES ($1, $2, TRUE) RETURNING *`,
-      [skillProgress.id, nextVersion],
+      `INSERT INTO routines (skill_progress_id, version, is_active, coach_notes)
+       VALUES ($1, $2, TRUE, $3) RETURNING *`,
+      [skillProgress.id, nextVersion, routineData.coach_notes || null],
     );
     const routine = routineResult.rows[0];
 
