@@ -170,7 +170,8 @@ client/
 - [ ] Exercise video guides
 - [ ] Progress charts and analytics
 - [ ] Streak tracking
-
+- [ ] Seeding more skills
+ 
 ## Philosophy
 
 Most fitness apps are either too generic or locked behind subscriptions. Calisthenio runs locally, respects your privacy, and gives you a coach that actually knows your progression history — not just a random workout generator.
