@@ -1,21 +1,11 @@
 import client from "./client";
 
 export const getProfile = async () => {
-  try {
-    const { data } = await client.get("/profile");
-    return data;
-  } catch (error) {
-    if (error.response?.status === 404) return null;
-    throw error;
-  }
+  const { data } = await client.get("/profile");
+  return data;
 };
 
 export const createProfile = async (profileData) => {
-  try {
-    const { data } = await client.post("/profile", profileData);
-    return data;
-  } catch (error) {
-    if (error.response?.status === 404) return null;
-    throw error;
-  }
+  const { data } = await client.post("/profile", profileData);
+  return data;
 };
