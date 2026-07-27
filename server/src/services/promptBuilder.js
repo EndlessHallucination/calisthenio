@@ -8,7 +8,6 @@ function buildRoutinePrompt({
   availableExercises,
   recentWorkouts,
   equipment,
-  otherActiveSkills,
   generalExercises,
 }) {
   const completed =
@@ -132,14 +131,6 @@ PROGRESSION RULES
 - Do NOT include hold-based exercises targeting durations beyond what the athlete can currently achieve.
 - For reps, always use a specific number like "5" or "8-10". Never use "Max effort" or vague descriptions.
 
-=========================
-CONCURRENT SKILLS
-=========================
-${
-  otherActiveSkills.length > 0
-    ? `The athlete is also training:\n${otherActiveSkills.map((s) => `- ${s.name} (${s.category})`).join("\n")}\n\nConsider recovery and avoid overloading the same muscle groups.`
-    : "No other skills currently being trained."
-}
 
 
 =========================

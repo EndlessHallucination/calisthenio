@@ -107,16 +107,6 @@ const buildRoutineContext = async (skillId, client) => {
       equipment.includes(e.equipment),
   );
 
-  // other active skills
-  const activeSkillsResult = await client.query(
-    `SELECT s.name, s.category
-       FROM skills s
-       JOIN skill_progress sp ON sp.skill_id = s.id
-       WHERE sp.status = 'active' AND s.id != $1`,
-    [skillId],
-  );
-  const otherActiveSkills = activeSkillsResult.rows;
-
   return {
     profile,
     skill,
@@ -129,7 +119,6 @@ const buildRoutineContext = async (skillId, client) => {
     generalExercises,
     recentWorkouts,
     equipment,
-    otherActiveSkills,
   };
 };
 
