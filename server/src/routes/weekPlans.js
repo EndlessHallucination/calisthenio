@@ -1,11 +1,25 @@
 const express = require("express");
 const router = express.Router();
-const { generateAndStoreWeekPlan } = require("../services/weekPlanService");
+const {
+  generateAndStoreWeekPlan,
+  getActiveWeekPlan,
+} = require("../services/weekPlanService");
 
 router.post("/generate", async (req, res) => {
   try {
     const result = await generateAndStoreWeekPlan();
     res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/active", async (req, res) => {
+  try {
+    const result = await getActiveWeekPlan();
+    if (!result)
+      return res.status(404).json({ error: "No active week plan found" });
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

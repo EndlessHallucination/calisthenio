@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getActiveSkills, getCompletedSkills } from "../api/skills"
 import { getProfile } from "../api/profile";
+import { getActiveWeekPlan } from '../api/weekPlans'
+
 import SkillCard from '../components/SkillCard'
 
 export default function Dashboard() {
@@ -25,6 +27,13 @@ export default function Dashboard() {
     const { data: profile, isLoading: profileLoading } = useQuery({
         queryKey: ['profile'],
         queryFn: getProfile,
+        retry: false,
+        throwOnError: false
+    })
+
+    const { data: weekPlan } = useQuery({
+        queryKey: ['weekPlan/active'],
+        queryFn: getActiveWeekPlan,
         retry: false,
         throwOnError: false
     })
@@ -69,7 +78,7 @@ export default function Dashboard() {
 
             <div className="flex flex-col gap-6">
                 {activeSkills.map(skill => (
-                    <SkillCard key={skill.id} skill={skill} />
+                    <SkillCard key={skill.id} skill={skill} weekPlan={weekPlan} />
                 ))}
             </div>
 

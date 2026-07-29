@@ -30,7 +30,11 @@ const generateAndStoreWeekPlan = async () => {
     // 4. call ollama
 
     const weekPlanData = await generateWeekPlan(prompt);
-
+    console.log("Sessions count:", weekPlanData?.sessions?.length);
+    console.log(
+      "First session:",
+      JSON.stringify(weekPlanData?.sessions?.[0], null, 2),
+    );
     // 5. mark previous week plan inactive
     await client.query(`
       UPDATE week_plans SET is_active = FALSE
@@ -122,15 +126,58 @@ const generateAndStoreWeekPlan = async () => {
       }
     }
     // 9. commit and return
-    return weekPlan;
 
     await client.query("COMMIT");
+
+    return weekPlan;
   } catch (err) {
     await client.query("ROLLBACK");
+    console.error("Week plan generation failed:", err.message);
     throw err;
   } finally {
     client.release();
   }
 };
 
-module.exports = { generateAndStoreWeekPlan };
+const getActiveWeekPlan = async () => {
+  const result = await db.query(`
+    SELECT
+      wp.*,
+      json_agg(
+        json_build_object(
+          'id', ws.id,
+          'label', ws.label,
+          'skill_id', ws.skill_id,
+          'order_index', ws.order_index,
+          'exercises', (
+            SELECT json_agg(
+              json_build_object(
+                'id', wse.id,
+                'exercise_id', wse.exercise_id,
+                'exercise_name', e.name,
+                'category', e.category,
+                'order_index', wse.order_index,
+                'sets', wse.sets,
+                'reps', wse.reps,
+                'hold_time_seconds', wse.hold_time_seconds,
+                'rest_seconds', wse.rest_seconds,
+                'notes', wse.notes,
+                'section', wse.section
+              ) ORDER BY wse.order_index
+            )
+            FROM week_session_exercises wse
+            JOIN exercises e ON e.id = wse.exercise_id
+            WHERE wse.week_session_id = ws.id
+          )
+        ) ORDER BY ws.order_index
+      ) AS sessions
+    FROM week_plans wp
+    LEFT JOIN week_sessions ws ON ws.week_plan_id = wp.id
+    WHERE wp.is_active = TRUE
+    GROUP BY wp.id
+    LIMIT 1
+  `);
+  return result.rows[0] || null;
+};
+
+module.exports = { generateAndStoreWeekPlan, getActiveWeekPlan };
